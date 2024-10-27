@@ -4,7 +4,9 @@ import com.alamin.dto.AccountDto;
 
 public interface AccountService {
 
-	AccountDto createAccount(AccountDto accountDto);
+	String createAccount(AccountDto accountDto);
 
 	AccountDto getAccountById(Long id);
+	
+	String loginAccount(String username, String password);
 }
