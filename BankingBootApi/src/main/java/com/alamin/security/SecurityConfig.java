@@ -27,16 +27,19 @@ public class SecurityConfig {
 		    .csrf(csrf -> csrf.disable())
 		    .authorizeHttpRequests(authz -> authz
 		        .requestMatchers("/api/accounts/**").permitAll()
-				.requestMatchers("/api/accounts/showAccount/**").hasRole("USER")
-				.requestMatchers("/api/accounts/showAllAccounts").hasRole("ADMIN")
-						 
+				.requestMatchers("/api/user/**").hasAuthority("USER")
+				.requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 		        .anyRequest().authenticated()
-		    )
-				/*
-				 * .formLogin(form -> form .loginProcessingUrl("/api/accounts/login")
-				 * .permitAll() ) .logout(logout -> logout .logoutUrl("/api/accounts/logout")
-				 * .permitAll() )
-				 */
+		                )
+			/*	.formLogin(form -> form 
+						.loginProcessingUrl("/api/accounts/login")
+				        .permitAll() 
+				        ) 
+				.logout(logout -> logout 
+						.logoutUrl("/api/accounts/logout")
+				        .permitAll() 
+				        )*/
+				 
 		    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		    .httpBasic(Customizer.withDefaults());
 		

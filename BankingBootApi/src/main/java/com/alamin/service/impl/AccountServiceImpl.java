@@ -1,6 +1,8 @@
 package com.alamin.service.impl;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -62,7 +64,63 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountDto getAccountById(Long id) {
 
-		Account account = accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found."));
+		Account account = accountRepository
+				.findById(id)
+				.orElseThrow(() -> new RuntimeException("Account not found."));
+
+		return AccountMapper.mapToAccountDto(account);
+	}
+
+	@Override
+	public AccountDto deposit(Long id, double amount) {
+		Account account = accountRepository
+				.findById(id)
+				.orElseThrow(() -> new RuntimeException("Account not found."));
+		
+		double total = account.getBalance() + amount;
+		account.setBalance(total);
+		Account savedAccount = accountRepository.save(account);
+		return AccountMapper.mapToAccountDto(savedAccount);
+	}
+
+	@Override
+	public AccountDto withdraw(Long id, double amount) {
+		Account account = accountRepository
+				.findById(id)
+				.orElseThrow(() -> new RuntimeException("Account not found."));
+		
+		if(account.getBalance()< amount) {
+			throw new RuntimeException("Insufficient balance.");
+		}
+		double total = account.getBalance() - amount;
+		account.setBalance(total);
+		Account savedAccount = accountRepository.save(account);
+		return AccountMapper.mapToAccountDto(savedAccount);
+	}
+
+	@Override
+	public List<AccountDto> getAllAccounts() {
+		List<Account> accounts = accountRepository.findAll();
+		return accounts.stream().map((account) -> AccountMapper.mapToAccountDto(account))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public void deleteAccount(Long id) {
+		accountRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Account not exists."));
+		
+		accountRepository.deleteById(id);
+	}
+
+	@Override
+	public AccountDto getUserAccount() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+		String username = authentication.getName();
+		Account account = accountRepository
+				.findByUsername(username)
+				.orElseThrow(() -> new RuntimeException("Account not found."));
 
 		return AccountMapper.mapToAccountDto(account);
 	}
