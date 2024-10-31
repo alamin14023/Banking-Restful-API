@@ -36,12 +36,11 @@ public class UserController {
 		return ResponseEntity.ok(accountDto);
 	}
 	
-	@PutMapping("/withdraw/{id}")
-	public ResponseEntity<AccountDto> withdraw(@PathVariable Long id,
-			@RequestBody Map<String, Double> request){
+	@PutMapping("/withdraw")
+	public ResponseEntity<AccountDto> withdraw(@RequestBody Map<String, Double> request){
 		
 		Double amount = request.get("amount");
-		AccountDto accountDto = accountService.withdraw(id, amount);
+		AccountDto accountDto = accountService.withdraw(amount);
 		return ResponseEntity.ok(accountDto);
 	}
 }

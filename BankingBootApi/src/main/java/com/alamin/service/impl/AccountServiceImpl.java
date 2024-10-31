@@ -84,9 +84,12 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public AccountDto withdraw(Long id, double amount) {
+	public AccountDto withdraw(double amount) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+		String username = authentication.getName();
 		Account account = accountRepository
-				.findById(id)
+				.findByUsername(username)
 				.orElseThrow(() -> new RuntimeException("Account not found."));
 		
 		if(account.getBalance()< amount) {

@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/api/accounts")
+@RequestMapping("/api/home")
 public class HomeController {
 
 	@Autowired
