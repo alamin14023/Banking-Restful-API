@@ -1,7 +1,6 @@
 package com.alamin.service.impl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.alamin.dto.AccountDto;
 import com.alamin.entity.Account;
 import com.alamin.entity.Role;
+import com.alamin.exception.AccountException;
 import com.alamin.mapper.AccountMapper;
 import com.alamin.repository.AccountRepository;
 import com.alamin.repository.RoleRepository;
@@ -53,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
 		if(accountRepository.existsByUsername(accountDto.getUsername())) {
 			return "Error: Username is already taken!";
 		}
-		Role roles = roleRepository.findByName("USER").orElseThrow(() -> new NoSuchElementException("Not found"));
+		Role roles = roleRepository.findByName("USER").orElseThrow(() -> new AccountException("Not found"));
 		Account account = AccountMapper.mapToAccount(accountDto, roles);
 		account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
 		accountRepository.save(account);
@@ -66,7 +66,7 @@ public class AccountServiceImpl implements AccountService {
 
 		Account account = accountRepository
 				.findById(id)
-				.orElseThrow(() -> new RuntimeException("Account not found."));
+				.orElseThrow(() -> new AccountException("Account not found."));
 
 		return AccountMapper.mapToAccountDto(account);
 	}
@@ -75,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
 	public AccountDto deposit(Long id, double amount) {
 		Account account = accountRepository
 				.findById(id)
-				.orElseThrow(() -> new RuntimeException("Account not found."));
+				.orElseThrow(() -> new AccountException("Account not found."));
 		
 		double total = account.getBalance() + amount;
 		account.setBalance(total);
@@ -90,10 +90,10 @@ public class AccountServiceImpl implements AccountService {
 		String username = authentication.getName();
 		Account account = accountRepository
 				.findByUsername(username)
-				.orElseThrow(() -> new RuntimeException("Account not found."));
+				.orElseThrow(() -> new AccountException("Account not found."));
 		
 		if(account.getBalance()< amount) {
-			throw new RuntimeException("Insufficient balance.");
+			throw new AccountException("Insufficient balance.");
 		}
 		double total = account.getBalance() - amount;
 		account.setBalance(total);
@@ -111,7 +111,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public void deleteAccount(Long id) {
 		accountRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Account not exists."));
+				.orElseThrow(() -> new AccountException("Account not exists."));
 		
 		accountRepository.deleteById(id);
 	}
@@ -123,7 +123,7 @@ public class AccountServiceImpl implements AccountService {
 		String username = authentication.getName();
 		Account account = accountRepository
 				.findByUsername(username)
-				.orElseThrow(() -> new RuntimeException("Account not found."));
+				.orElseThrow(() -> new AccountException("Account not found."));
 
 		return AccountMapper.mapToAccountDto(account);
 	}
